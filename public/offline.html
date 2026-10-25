@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f6f1e6" />
+    <title>オフライン｜神旅帳</title>
+    <style>
+      html { font-size: 17px; -webkit-text-size-adjust: 100%; }
+      body {
+        margin: 0; min-height: 100dvh; display: flex; flex-direction: column;
+        align-items: center; justify-content: center; gap: 14px; padding: 32px 24px;
+        font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", system-ui, sans-serif;
+        color: #26221e; text-align: center; line-height: 1.8;
+        background-color: #f6f1e6;
+        background-image: radial-gradient(circle at 20% 30%, rgba(140,95,56,.05) 0 1px, transparent 1px),
+                          radial-gradient(circle at 70% 65%, rgba(38,34,30,.03) 0 1px, transparent 1px);
+        background-size: 22px 22px, 31px 31px;
+      }
+      .seal {
+        width: 92px; height: 92px; border-radius: 50%; border: 2px solid #a8322a; color: #a8322a;
+        display: flex; align-items: center; justify-content: center; position: relative;
+      }
+      .seal::after { content: ""; position: absolute; inset: 5px; border: 1px solid rgba(168,50,42,.3); border-radius: 50%; }
+      .seal span { font-family: "Noto Serif JP", "Yu Mincho", serif; font-size: 34px; letter-spacing: .08em; }
+      h1 { font-family: "Noto Serif JP", "Yu Mincho", serif; font-size: 1.35rem; letter-spacing: .1em; margin: 6px 0 0; }
+      p { margin: 0; font-size: .9rem; color: #57504a; max-width: 22rem; }
+      .hint { font-size: .78rem; color: #8b8377; margin-top: 4px; }
+      button, a {
+        display: inline-flex; align-items: center; justify-content: center; min-height: 48px;
+        padding: 0 22px; border-radius: 12px; font-size: .95rem; font-weight: 700;
+        text-decoration: none; cursor: pointer; font-family: inherit;
+      }
+      .primary { background: #a8322a; color: #fffdf7; border: 0; }
+      .secondary { background: #fffdf7; color: #26221e; border: 1.5px solid #ddd2ba; }
+      .row { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; justify-content: center; }
+    </style>
+  </head>
+  <body>
+    <div class="seal"><span>神</span></div>
+    <h1>オフラインのようです</h1>
+    <p>電波の届く場所で、もう一度お試しください。すでに表示した御朱印帳はアプリから閲覧できます。</p>
+    <p class="hint">参拝記録の登録には通信が必要です。</p>
+    <div class="row">
+      <button class="primary" onclick="location.reload()">再読み込み</button>
+      <a class="secondary" href="/">ホームへ戻る</a>
+    </div>
+  </body>
+</html>

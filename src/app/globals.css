@@ -1,0 +1,616 @@
+@import "tailwindcss";
+
+/* ============================================================
+   神旅帳 v1.1 デザインシステム
+   コンセプト: 「和モダン × 御朱印帳」
+   - 生成り（washi）/ 墨（sumi）/ 朱（shu）/ 金（kin）/ 森（mori）
+   - 御朱印の朱印・和紙の質感・金箔のヘアラインで高級感を出す
+   - モバイル最適化（44px以上のタップ領域 / セーフエリア / 文字サイズ）
+   ============================================================ */
+
+@theme {
+  --color-washi: #f6f1e6;
+  --color-washi-deep: #ece4d3;
+  --color-washi-line: #ddd2ba;
+  --color-paper: #fffdf7;
+  --color-sumi: #26221e;
+  --color-sumi-soft: #57504a;
+  --color-sumi-mute: #8b8377;
+  --color-shu: #a8322a;
+  --color-shu-deep: #87241d;
+  --color-shu-soft: #c2453a;
+  --color-kin: #a8894f;
+  --color-kin-soft: #d9c08a;
+  --color-mokume: #8c5f38;
+  --color-mokume-deep: #6b4626;
+  --color-mori: #46604a;
+  --color-ai: #2f4058;
+
+  --font-mincho: "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "MS PMincho", serif;
+  --font-gothic: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", system-ui, sans-serif;
+
+  --radius-wa: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 17px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-gothic);
+  background-color: var(--color-washi);
+  color: var(--color-sumi);
+  line-height: 1.8;
+  letter-spacing: 0.012em;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 和紙の質感 */
+.bg-washi-texture {
+  background-color: var(--color-washi);
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(140, 95, 56, 0.05) 0 1px, transparent 1px),
+    radial-gradient(circle at 70% 65%, rgba(38, 34, 30, 0.032) 0 1px, transparent 1px),
+    linear-gradient(180deg, #faf6ec 0%, #f3eddf 100%);
+  background-size: 22px 22px, 31px 31px, 100% 100%;
+  background-attachment: fixed;
+}
+
+/* 木目調 */
+.bg-mokume {
+  background-color: #8c5f38;
+  background-image:
+    repeating-linear-gradient(
+      92deg,
+      rgba(255, 255, 255, 0.06) 0px,
+      rgba(255, 255, 255, 0.06) 2px,
+      rgba(0, 0, 0, 0.09) 3px,
+      rgba(0, 0, 0, 0.09) 5px
+    ),
+    linear-gradient(180deg, #9d6c40 0%, #6f4a2a 100%);
+}
+
+/* 金箔のヘアライン */
+.gold-hairline {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-kin-soft) 20%, var(--color-kin) 50%, var(--color-kin-soft) 80%, transparent);
+  opacity: 0.7;
+}
+
+.font-mincho {
+  font-family: var(--font-mincho);
+  font-feature-settings: "palt" 1;
+}
+
+/* ---------------- カード ---------------- */
+.wa-card {
+  position: relative;
+  background-color: var(--color-paper);
+  border: 1px solid var(--color-washi-line);
+  border-radius: var(--radius-wa);
+  box-shadow:
+    0 1px 2px rgba(38, 34, 30, 0.04),
+    0 10px 26px -18px rgba(38, 34, 30, 0.32);
+  overflow: hidden;
+}
+
+.wa-card-flat {
+  background-color: var(--color-paper);
+  border: 1px solid var(--color-washi-line);
+  border-radius: var(--radius-wa);
+}
+
+/* 御朱印帳の綴じ目を思わせる左の朱線 */
+.wa-card-accent::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 14px;
+  bottom: 14px;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--color-shu) 0%, rgba(168, 50, 42, 0.15) 100%);
+}
+
+.wa-hairline {
+  border-bottom: 1px solid var(--color-washi-line);
+}
+
+.wa-rule {
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-shu) 0%, var(--color-kin-soft) 45%, transparent 100%);
+}
+
+.torii-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--color-kin);
+}
+.torii-divider::before,
+.torii-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-washi-line), transparent);
+}
+
+/* ---------------- ボタン ---------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 52px;
+  padding: 0.72rem 1.25rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.12s ease, filter 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+  user-select: none;
+  touch-action: manipulation;
+}
+.btn:active {
+  transform: scale(0.98);
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.btn-primary {
+  background: linear-gradient(180deg, #b43a31 0%, var(--color-shu) 55%, var(--color-shu-deep) 100%);
+  color: #fffdf7;
+  box-shadow: 0 6px 18px -10px rgba(168, 50, 42, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+.btn-outline {
+  background-color: var(--color-paper);
+  color: var(--color-sumi);
+  border: 1.5px solid var(--color-washi-line);
+}
+.btn-outline:hover:not(:disabled) {
+  border-color: var(--color-mokume);
+  color: var(--color-mokume-deep);
+}
+.btn-ghost {
+  background-color: transparent;
+  color: var(--color-sumi-soft);
+  min-height: 44px;
+  font-size: 0.9rem;
+}
+.btn-ghost:hover:not(:disabled) {
+  background-color: rgba(140, 95, 56, 0.08);
+}
+.btn-sm {
+  min-height: 40px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.86rem;
+  border-radius: 10px;
+}
+
+/* ---------------- フォーム ---------------- */
+.field {
+  width: 100%;
+  min-height: 52px;
+  padding: 0.7rem 0.9rem;
+  border: 1.5px solid var(--color-washi-line);
+  border-radius: 12px;
+  background-color: var(--color-paper);
+  font-size: 1rem;
+  color: var(--color-sumi);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.field:focus {
+  outline: none;
+  border-color: var(--color-shu);
+  box-shadow: 0 0 0 3px rgba(168, 50, 42, 0.12);
+}
+.field::placeholder {
+  color: #a9a196;
+}
+textarea.field {
+  line-height: 1.7;
+  resize: vertical;
+}
+
+/* ---------------- チップ ---------------- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.32rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: 1px solid var(--color-washi-line);
+  background-color: var(--color-paper);
+  color: var(--color-sumi-soft);
+  white-space: nowrap;
+}
+.chip-active {
+  background: linear-gradient(180deg, var(--color-shu-soft), var(--color-shu));
+  border-color: var(--color-shu);
+  color: #fffdf7;
+  box-shadow: 0 4px 12px -8px rgba(168, 50, 42, 0.8);
+}
+.chip-btn {
+  min-height: 40px;
+  padding: 0.5rem 0.95rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.1s ease, background-color 0.15s ease;
+}
+.chip-btn:active {
+  transform: scale(0.97);
+}
+
+.badge-visited {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.12rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  background-color: rgba(70, 96, 74, 0.12);
+  color: var(--color-mori);
+  border: 1px solid rgba(70, 96, 74, 0.26);
+}
+.badge-demo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background-color: rgba(168, 137, 79, 0.14);
+  color: #7a5f2c;
+  border: 1px solid rgba(168, 137, 79, 0.35);
+}
+
+/* ---------------- 見出し ---------------- */
+.section-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+}
+.section-title h2 {
+  font-family: var(--font-mincho);
+  font-size: 1.08rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--color-sumi);
+  position: relative;
+  padding-left: 0.7rem;
+}
+.section-title h2::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.42em;
+  width: 3px;
+  height: 0.9em;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--color-shu), var(--color-kin-soft));
+}
+.section-title a {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-shu);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.eyebrow {
+  font-size: 0.68rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--color-kin);
+}
+
+/* ---------------- 御朱印フレーム ---------------- */
+.goshuin-frame {
+  position: relative;
+  background: linear-gradient(160deg, #fffdf7 0%, #f6efe0 100%);
+  border: 1px solid var(--color-washi-line);
+  border-radius: 10px;
+  padding: 5px;
+}
+.goshuin-frame::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(168, 50, 42, 0.18);
+  border-radius: 7px;
+  pointer-events: none;
+}
+.goshuin-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+  display: block;
+}
+
+/* ---------------- 統計 ---------------- */
+.stat-value {
+  font-family: var(--font-mincho);
+  font-size: 1.65rem;
+  line-height: 1.2;
+  font-weight: 600;
+  color: var(--color-shu);
+  font-variant-numeric: tabular-nums;
+}
+.stat-label {
+  font-size: 0.72rem;
+  color: var(--color-sumi-mute);
+  letter-spacing: 0.04em;
+}
+
+/* ---------------- ナビゲーション ---------------- */
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 560px;
+  z-index: 30;
+  background-color: rgba(255, 253, 247, 0.96);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid var(--color-washi-line);
+  box-shadow: 0 -8px 24px -20px rgba(38, 34, 30, 0.5);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.nav-item {
+  min-height: 58px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--color-sumi-mute);
+  transition: color 0.18s ease, background-color 0.18s ease;
+  position: relative;
+}
+.nav-item[aria-current="page"] {
+  color: var(--color-shu);
+}
+.nav-item[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 26px;
+  height: 2.5px;
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(90deg, var(--color-shu), var(--color-kin));
+}
+.nav-item:active {
+  background-color: rgba(140, 95, 56, 0.1);
+}
+
+/* 5タブ時のラベル折返しを防ぐ */
+.nav-item span {
+  white-space: nowrap;
+  font-size: 0.66rem;
+}
+
+/* ---------------- セーフエリア ---------------- */
+.pb-safe {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
+}
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* ---------------- アニメーション ---------------- */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes seal-in {
+  0% {
+    opacity: 0;
+    transform: scale(1.7) rotate(-14deg);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(0.96) rotate(-5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-4deg);
+  }
+}
+@keyframes seal-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-4deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(-4deg);
+  }
+}
+@keyframes shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+@keyframes ring-fill {
+  from {
+    stroke-dashoffset: var(--ring-circumference);
+  }
+}
+
+.anim-in {
+  animation: fade-up 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.anim-fade {
+  animation: fade-in 0.4s ease both;
+}
+.stagger > * {
+  animation: fade-up 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.stagger > *:nth-child(1) { animation-delay: 0.02s; }
+.stagger > *:nth-child(2) { animation-delay: 0.06s; }
+.stagger > *:nth-child(3) { animation-delay: 0.1s; }
+.stagger > *:nth-child(4) { animation-delay: 0.14s; }
+.stagger > *:nth-child(5) { animation-delay: 0.18s; }
+.stagger > *:nth-child(6) { animation-delay: 0.22s; }
+.stagger > *:nth-child(7) { animation-delay: 0.26s; }
+.stagger > *:nth-child(8) { animation-delay: 0.3s; }
+
+/* チェックイン成功時の朱印 */
+.seal-stamp {
+  animation: seal-in 0.6s cubic-bezier(0.2, 0.9, 0.25, 1.1) both, seal-float 3.6s ease-in-out 0.7s infinite;
+}
+
+.press {
+  transition: transform 0.12s ease;
+}
+.press:active {
+  transform: scale(0.985);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------------- その他 ---------------- */
+:focus-visible {
+  outline: 2px solid var(--color-shu);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.modal-sheet {
+  max-height: 90dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.modal-sheet::before {
+  content: "";
+  display: block;
+  width: 44px;
+  height: 4px;
+  margin: 0 auto 12px;
+  border-radius: 999px;
+  background-color: var(--color-washi-line);
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--color-washi-deep) 25%, #f7f2e7 37%, var(--color-washi-deep) 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: 10px;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* 横スクロールのカード列 */
+.h-scroll {
+  display: flex;
+  gap: 0.7rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 0.25rem;
+  margin-inline: -1rem;
+  padding-inline: 1rem;
+}
+.h-scroll > * {
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+}
+
+/* 縦書き（ログイン画面の飾り） */
+.vertical {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  letter-spacing: 0.28em;
+}
+
+@media (max-width: 374px) {
+  html {
+    font-size: 16px;
+  }
+  .btn {
+    padding: 0.68rem 1rem;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .wa-card {
+    border-color: #b3a68d;
+  }
+  .stat-label {
+    color: #6b645a;
+  }
+}
+
+/* 印刷（御朱印帳の控えなど） */
+@media print {
+  .tabbar,
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+  .wa-card {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}

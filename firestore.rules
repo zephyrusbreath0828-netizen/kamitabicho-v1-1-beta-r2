@@ -1,0 +1,152 @@
+rules_version = '2';
+
+// ============================================================
+// 神旅帳 v1.1 - Cloud Firestore セキュリティルール
+//
+// コレクション:
+//   users/{uid}       本人のみ読み書き
+//   visits/{id}       本人のみ作成・削除（更新不可）
+//   goshuin/{id}      本人のみ作成・削除（メモのみ更新可）
+//   favorites/{id}    本人のみ作成・削除（ID は uid_shrineId）
+//   shrines/{id}      全員読み取り可・書き込み不可（visit_count の ±1 のみ許可）
+//   それ以外          全拒否
+//
+// 位置情報の 300m 判定はクライアント実装だが、distance_m <= 300 をサーバー側でも強制する。
+// ============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function str(value, max) {
+      return value is string && value.size() > 0 && value.size() <= max;
+    }
+
+    function optionalStr(value, max) {
+      return value == null || str(value, max);
+    }
+
+    // ------------------------------------------------------------
+    // users/{uid}
+    // ------------------------------------------------------------
+    match /users/{uid} {
+      allow read: if isSelf(uid);
+
+      allow create: if isSelf(uid)
+        && request.resource.data.uid == uid
+        && str(request.resource.data.nickname, 24)
+        && optionalStr(request.resource.data.photo_url, 2048)
+        && request.resource.data.created_at is string
+        && request.resource.data.updated_at is string;
+
+      allow update: if isSelf(uid)
+        && request.resource.data.uid == uid
+        && str(request.resource.data.nickname, 24)
+        && optionalStr(request.resource.data.photo_url, 2048);
+
+      // 退会処理はサーバー（Admin SDK）で行う
+      allow delete: if false;
+    }
+
+    // ------------------------------------------------------------
+    // visits/{visitId} — GPS 参拝記録
+    // ------------------------------------------------------------
+    match /visits/{visitId} {
+      allow read: if signedIn() && resource.data.user_id == request.auth.uid;
+
+      allow create: if signedIn()
+        && request.resource.data.user_id == request.auth.uid
+        && str(request.resource.data.shrine_id, 64)
+        && request.resource.data.visit_datetime is string
+        && request.resource.data.latitude is number
+        && request.resource.data.longitude is number
+        && request.resource.data.latitude >= -90 && request.resource.data.latitude <= 90
+        && request.resource.data.longitude >= -180 && request.resource.data.longitude <= 180
+        && (!('distance_m' in request.resource.data)
+            || (request.resource.data.distance_m is number
+                && request.resource.data.distance_m >= 0
+                && request.resource.data.distance_m <= 300));
+
+      // 記録の改ざんは不可（削除して再登録）
+      allow update: if false;
+      allow delete: if signedIn() && resource.data.user_id == request.auth.uid;
+    }
+
+    // ------------------------------------------------------------
+    // goshuin/{goshuinId} — 御朱印帳
+    // ------------------------------------------------------------
+    match /goshuin/{goshuinId} {
+      allow read: if signedIn() && resource.data.user_id == request.auth.uid;
+
+      allow create: if signedIn()
+        && request.resource.data.user_id == request.auth.uid
+        && str(request.resource.data.shrine_id, 64)
+        // Storage の URL もしくは移行時の data URL を許可（Firestore の 1MB 制限量内）
+        && str(request.resource.data.image_url, 900000)
+        && request.resource.data.memo is string
+        && request.resource.data.memo.size() <= 300
+        && request.resource.data.created_at is string
+        && (!('visited_date' in request.resource.data)
+            || (request.resource.data.visited_date is string
+                && request.resource.data.visited_date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')));
+
+      // メモの修正のみ許可
+      allow update: if signedIn()
+        && resource.data.user_id == request.auth.uid
+        && request.resource.data.user_id == request.auth.uid
+        && request.resource.data.memo is string
+        && request.resource.data.memo.size() <= 300;
+
+      allow delete: if signedIn() && resource.data.user_id == request.auth.uid;
+    }
+
+    // ------------------------------------------------------------
+    // favorites/{uid_shrineId}
+    // ------------------------------------------------------------
+    match /favorites/{favoriteId} {
+      allow read: if signedIn() && resource.data.user_id == request.auth.uid;
+
+      allow create: if signedIn()
+        && request.resource.data.user_id == request.auth.uid
+        && str(request.resource.data.shrine_id, 64)
+        && favoriteId == request.auth.uid + '_' + request.resource.data.shrine_id;
+
+      allow update: if false;
+      allow delete: if signedIn() && resource.data.user_id == request.auth.uid;
+    }
+
+    // ------------------------------------------------------------
+    // shrines/{shrineId} — マスタ（投入は Admin SDK / シード）
+    // ------------------------------------------------------------
+    match /shrines/{shrineId} {
+      allow read: if true;
+      allow create, delete: if false;
+
+      // 参拝数の増減のみ許可
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['visit_count'])
+        && request.resource.data.visit_count is int
+        && (request.resource.data.visit_count == resource.data.visit_count + 1
+            || request.resource.data.visit_count == resource.data.visit_count - 1);
+    }
+
+    // ------------------------------------------------------------
+    // v1.0 の旧コレクションは読み取りのみ許可（移行用。新規書き込みは不可）
+    // ------------------------------------------------------------
+    match /visit_history/{visitId} {
+      allow read: if signedIn() && resource.data.user_id == request.auth.uid;
+      allow create, update, delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
